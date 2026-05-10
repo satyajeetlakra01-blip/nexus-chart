@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
@@ -1750,16 +1751,15 @@
     </div>
 
     <script>
-        // Firebase Configuration - Replace with your own Firebase config
-        // To get your config: https://console.firebase.google.com → Your Project → Project Settings → Add Web App
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyYOUR_API_KEY_HERE",
-            authDomain: "your-project.firebaseapp.com",
-            databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-            projectId: "your-project",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "your-app-id"
+            apiKey: "AIzaSyDvgXRInpYIrwUgab0fuV1mBAqtGbxxDxg",
+            authDomain: "nexus-hub-a5a96.firebaseapp.com",
+            projectId: "nexus-hub-a5a96",
+            storageBucket: "nexus-hub-a5a96.firebasestorage.app",
+            messagingSenderId: "520212625536",
+            appId: "1:520212625536:web:2dd86def99bcf073644e65",
+            measurementId: "G-7GZ3862HZ3"
         };
 
         // Initialize Firebase
@@ -1767,6 +1767,7 @@
         let storage;
         try {
             firebase.initializeApp(firebaseConfig);
+            firebase.analytics();
             db = firebase.database();
             storage = firebase.storage();
         } catch(e) {
