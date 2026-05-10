@@ -1,0 +1,6 @@
+# Ignore local storage data (this is browser-specific)
+*.html.backup
+
+# Optional: ignore system files
+.DS_Store
+Thumbs.db
