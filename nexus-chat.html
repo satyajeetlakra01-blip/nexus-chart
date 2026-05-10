@@ -294,6 +294,7 @@
                             <div class="output-header">
                                 <h3>📄 Generated Project</h3>
                                 <div class="output-actions">
+                                    <button class="output-action" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
                                     <button class="output-action" onclick="copyProject()"><i class="fas fa-copy"></i> Copy</button>
                                     <button class="output-action" onclick="newProject()"><i class="fas fa-plus"></i> New</button>
                                 </div>
@@ -448,6 +449,38 @@ Include: Question variety, age-appropriate difficulty, and clear instructions.`;
             const text = document.getElementById('projectResult').innerText;
             navigator.clipboard.writeText(text);
             alert('Copied to clipboard!');
+        }
+
+        function downloadPDF() {
+            const content = document.getElementById('projectResult').innerHTML;
+            const board = document.getElementById('boardSelect').value;
+            const subject = document.getElementById('subjectSelect').value;
+            const chapter = document.getElementById('chapterInput').value || 'Project';
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${subject} - ${chapter}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+                        h1 { color: #333; border-bottom: 2px solid #00f0ff; padding-bottom: 10px; }
+                        h2 { color: #666; margin-top: 30px; }
+                        pre { white-space: pre-wrap; font-family: inherit; }
+                        @media print { body { padding: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <h1>NEXUS AI - ${subject} Project</h1>
+                    <h2>Board: ${board} | Chapter: ${chapter}</h2>
+                    <hr>
+                    ${content}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
         }
 
         function newProject() {
