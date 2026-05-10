@@ -9,6 +9,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --neon-cyan: #00f0ff;
@@ -1763,9 +1764,11 @@
 
         // Initialize Firebase
         let db;
+        let storage;
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
+            storage = firebase.storage();
         } catch(e) {
             console.log('Firebase not configured - using localStorage fallback');
         }
@@ -1970,15 +1973,59 @@
 
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    post.file = event.target.result;
-                    post.fileName = file.name;
-                    post.fileType = file.type;
-                    post.fileSize = formatFileSize(file.size);
-                    savePost(post);
-                };
-                reader.readAsDataURL(file);
+                const fileName = file.name;
+                const fileType = file.type;
+                const fileSize = file.size;
+
+                // Show uploading status
+                document.getElementById('selectedFileName').textContent = 'Uploading...';
+                document.getElementById('selectedFileName').style.display = 'inline';
+
+                if (storage) {
+                    // Upload to Firebase Storage
+                    const fileRef = storage.ref('files/' + Date.now() + '_' + fileName);
+                    const uploadTask = fileRef.put(file);
+
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            document.getElementById('selectedFileName').textContent = 'Uploading ' + Math.round(progress) + '%';
+                        },
+                        (error) => {
+                            console.error('Upload error:', error);
+                            alert('Upload failed. Using local storage fallback.');
+                            // Fallback to local storage
+                            post.file = null;
+                            post.fileName = fileName;
+                            post.fileType = fileType;
+                            post.fileSize = formatFileSize(fileSize);
+                            savePost(post);
+                        },
+                        () => {
+                            // Upload complete
+                            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                                post.file = downloadURL;
+                                post.fileName = fileName;
+                                post.fileType = fileType;
+                                post.fileSize = formatFileSize(fileSize);
+                                post.storageType = 'firebase';
+                                savePost(post);
+                            });
+                        }
+                    );
+                } else {
+                    // Fallback to FileReader (local storage)
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        post.file = event.target.result;
+                        post.fileName = fileName;
+                        post.fileType = fileType;
+                        post.fileSize = formatFileSize(fileSize);
+                        post.storageType = 'local';
+                        savePost(post);
+                    };
+                    reader.readAsDataURL(file);
+                }
             } else {
                 savePost(post);
             }
@@ -2139,14 +2186,64 @@
 
         document.getElementById('chatFile').addEventListener('change', function() {
             if (this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const msg = { id: Date.now(), author: username, isAdmin, text: null, image: e.target.result, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
-                    chatMessages.push(msg);
-                    localStorage.setItem('nexusChat', JSON.stringify(chatMessages));
-                    renderChat();
-                };
-                reader.readAsDataURL(this.files[0]);
+                const file = this.files[0];
+                const fileName = file.name;
+                const fileType = file.type;
+
+                if (storage) {
+                    // Upload to Firebase Storage
+                    const fileRef = storage.ref('chat-images/' + Date.now() + '_' + fileName);
+                    const uploadTask = fileRef.put(file);
+
+                    uploadTask.on('state_changed',
+                        () => {},
+                        (error) => {
+                            console.error('Chat image upload error:', error);
+                            alert('Image upload failed.');
+                        },
+                        () => {
+                            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                                const msg = {
+                                    id: Date.now(),
+                                    author: username,
+                                    authorName: fullname,
+                                    isAdmin,
+                                    text: null,
+                                    image: downloadURL,
+                                    imageType: 'firebase',
+                                    recipient: document.getElementById('chatRecipient').value || null,
+                                    isPublic: document.getElementById('chatPrivacySelect').value === 'public',
+                                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                };
+                                chatMessages.push(msg);
+                                localStorage.setItem('nexusChat', JSON.stringify(chatMessages));
+                                if (db) db.ref('chat').set(chatMessages);
+                                renderChat();
+                            });
+                        }
+                    );
+                } else {
+                    // Fallback to FileReader
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const msg = {
+                            id: Date.now(),
+                            author: username,
+                            authorName: fullname,
+                            isAdmin,
+                            text: null,
+                            image: e.target.result,
+                            imageType: 'local',
+                            recipient: document.getElementById('chatRecipient').value || null,
+                            isPublic: document.getElementById('chatPrivacySelect').value === 'public',
+                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        };
+                        chatMessages.push(msg);
+                        localStorage.setItem('nexusChat', JSON.stringify(chatMessages));
+                        renderChat();
+                    };
+                    reader.readAsDataURL(file);
+                }
                 this.value = '';
             }
         });
