@@ -202,26 +202,31 @@
             100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
         }
 
-        /* User panel */
+        /* User panel - Fixed at bottom */
         .user-panel {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            border-top: 1px solid rgba(0, 240, 255, 0.2);
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
         }
 
         .user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             position: relative;
+            flex-shrink: 0;
         }
 
         .admin-badge {
@@ -252,15 +257,19 @@
 
         .user-info {
             flex: 1;
+            min-width: 0;
         }
 
         .user-info .name {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .user-info .status {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
@@ -1554,11 +1563,8 @@
             <div class="content-area" id="page-team">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2 style="font-family: 'Orbitron', sans-serif;">
-                        <i class="fas fa-users" style="color: var(--neon-purple);"></i> Team Members
+                        <i class="fas fa-users" style="color: var(--neon-purple);"></i> Members
                     </h2>
-                    <button onclick="showAddMemberModal()" id="addMemberBtn" class="btn-glow" style="padding: 10px 20px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border: none; border-radius: 8px; color: #000; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-plus"></i> Add Member
-                    </button>
                 </div>
                 <div class="team-grid" id="teamGrid"></div>
             </div>
@@ -1586,6 +1592,20 @@
                     <i class="fas fa-cog" style="color: var(--neon-cyan);"></i> Settings
                 </h2>
                 <div class="settings-container">
+                    <!-- User Profile in Settings -->
+                    <div class="settings-section">
+                        <h3><i class="fas fa-user-circle"></i> My Profile</h3>
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 15px 0;">
+                            <div id="settingsAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; border: 3px solid var(--neon-cyan);">
+                                <span id="settingsAvatarLetter">A</span>
+                            </div>
+                            <div>
+                                <h4 id="settingsUserName" style="font-size: 20px; margin-bottom: 5px;">Admin</h4>
+                                <p id="settingsUserRole" style="color: var(--neon-cyan); font-size: 14px;">Admin</p>
+                                <button onclick="navigateTo('profile')" style="margin-top: 10px; padding: 8px 16px; background: var(--neon-purple); border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 12px;">Edit Profile</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="settings-section">
                         <h3><i class="fas fa-palette"></i> Appearance</h3>
                         <div class="setting-item">
@@ -1743,6 +1763,11 @@
             document.getElementById('profileRoleMember').style.display = 'inline';
         }
         document.getElementById('editDisplayName').value = fullname || username;
+
+        // Initialize Settings profile
+        document.getElementById('settingsAvatarLetter').textContent = username.charAt(0).toUpperCase();
+        document.getElementById('settingsUserName').textContent = fullname || username;
+        document.getElementById('settingsUserRole').textContent = isAdmin ? 'Admin' : 'Member';
 
         // Populate recipient dropdowns
         populateRecipientDropdowns();
@@ -2206,16 +2231,15 @@
             const teamGrid = document.getElementById('teamGrid');
             document.getElementById('teamCount').textContent = teamMembers.length;
             if (teamMembers.length === 0) {
-                teamGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><h4>No team members</h4><p>Add members as admin</p></div>';
+                teamGrid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><h4>All members</h4><p>Everyone who joins appears here automatically</p></div>';
                 return;
             }
-            teamGrid.innerHTML = teamMembers.map((member, index) => `
+            teamGrid.innerHTML = teamMembers.map((member) => `
                 <div class="team-member">
                     <div class="team-avatar">${member.name.charAt(0).toUpperCase()}</div>
                     <h4>${member.name}</h4>
                     <p class="role">@${member.username}</p>
                     <p class="status"><i class="fas fa-circle" style="font-size: 8px;"></i> ${member.status}</p>
-                    ${isAdmin ? `<button onclick="removeMember(${index})" style="margin-top: 10px; padding: 5px 15px; background: var(--neon-pink); border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 12px;">Remove</button>` : ''}
                     <button onclick="startChatWith('${member.username}')" style="margin-top: 10px; padding: 5px 15px; background: var(--neon-cyan); border: none; border-radius: 6px; color: #000; cursor: pointer; font-size: 12px;"><i class="fas fa-comment"></i> Chat</button>
                 </div>
             `).join('');
