@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS AI - Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --neon-cyan: #00f0ff; --neon-pink: #ff006e; --neon-purple: #8b5cf6; --neon-green: #00ff88; --dark-bg: #0a0a0f; }
+        body { font-family: 'Rajdhani', sans-serif; min-height: 100vh; background: var(--dark-bg); color: #fff; overflow: hidden; }
+        .app { display: flex; flex-direction: column; height: 100vh; }
+        .header { padding: 15px 30px; background: rgba(10,10,20,0.98); border-bottom: 1px solid rgba(0,240,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 20px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; gap: 10px; }
+        .header-btn { padding: 8px 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.6); cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 13px; transition: all 0.3s; }
+        .header-btn:hover { background: rgba(0,240,255,0.1); color: var(--neon-cyan); }
+        .model-bar { padding: 10px 30px; background: rgba(0,0,0,0.3); display: flex; align-items: center; gap: 15px; }
+        .model-bar label { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .model-select { padding: 6px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; color: #fff; font-family: 'Rajdhani', sans-serif; cursor: pointer; }
+        .model-select:focus { outline: none; border-color: var(--neon-cyan); }
+        .messages { flex: 1; padding: 20px 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .message { display: flex; gap: 15px; animation: slide 0.3s ease; }
+        @keyframes slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .user .avatar { background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple)); }
+        .ai .avatar { background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); }
+        .msg-content { flex: 1; max-width: 800px; }
+        .msg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .msg-name { font-weight: 600; font-size: 14px; }
+        .user .msg-name { color: var(--neon-pink); }
+        .ai .msg-name { color: var(--neon-cyan); }
+        .msg-time { font-size: 11px; color: rgba(255,255,255,0.4); }
+        .msg-text { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.9); }
+        .msg-text pre { background: rgba(0,0,0,0.4); border-radius: 10px; padding: 15px; margin: 10px 0; overflow-x: auto; border: 1px solid rgba(0,240,255,0.1); font-family: 'Courier New', monospace; font-size: 13px; white-space: pre-wrap; }
+        .msg-text code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; color: var(--neon-cyan); font-size: 13px; }
+        .typing { display: flex; align-items: center; gap: 5px; padding: 10px; }
+        .typing span { width: 8px; height: 8px; background: var(--neon-cyan); border-radius: 50%; animation: pulse 1.4s infinite; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+        .input-area { padding: 20px 30px; background: rgba(10,10,20,0.98); border-top: 1px solid rgba(0,240,255,0.1); }
+        .input-box { display: flex; gap: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; padding: 5px; transition: all 0.3s; }
+        .input-box:focus-within { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.2); }
+        .input-box textarea { flex: 1; padding: 12px 15px; background: transparent; border: none; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 16px; resize: none; min-height: 50px; max-height: 150px; }
+        .input-box textarea:focus { outline: none; }
+        .input-box textarea::placeholder { color: rgba(255,255,255,0.4); }
+        .send-btn { width: 50px; height: 50px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border: none; border-radius: 12px; color: #000; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .send-btn:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0,240,255,0.4); }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+        .welcome-icon { font-size: 80px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .welcome h1 { font-family: 'Orbitron', sans-serif; font-size: 32px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px; }
+        .welcome p { color: rgba(255,255,255,0.6); max-width: 500px; }
+        .suggestions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 600px; margin-top: 30px; }
+        .suggestion { background: rgba(0,0,0,0.3); border: 1px solid rgba(0,240,255,0.1); border-radius: 12px; padding: 20px; cursor: pointer; text-align: left; transition: all 0.3s; }
+        .suggestion:hover { border-color: var(--neon-cyan); transform: translateY(-3px); }
+        .suggestion i { font-size: 24px; color: var(--neon-cyan); margin-bottom: 10px; }
+        .suggestion h4 { font-size: 14px; margin-bottom: 5px; }
+        .suggestion p { font-size: 12px; color: rgba(255,255,255,0.5); }
+        .credit-info { font-size: 11px; color: rgba(255,255,255,0.4); padding: 8px 30px; background: rgba(0,0,0,0.3); text-align: center; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 3px; }
+        @media (max-width: 768px) { .suggestions { grid-template-columns: 1fr; } .header, .messages, .input-area, .model-bar { padding-left: 15px; padding-right: 15px; } }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1><i class="fas fa-robot"></i> NEXUS AI</h1>
+            <div class="header-actions">
+                <button class="header-btn" onclick="exportChat()"><i class="fas fa-download"></i> Export</button>
+                <button class="header-btn" onclick="clearChat()"><i class="fas fa-trash"></i> Clear</button>
+                <button class="header-btn" onclick="changeKey()"><i class="fas fa-key"></i> Key</button>
+            </div>
+        </header>
+        <div class="model-bar">
+            <label>Model:</label>
+            <select class="model-select" id="modelSelect">
+                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</option>
+                <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
+                <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="mistralai/mixtral-8x7b-instruct">Mixtral 8x7B</option>
+                <option value="meta-llama/llama-3-70b-instruct">LLaMA 3 70B</option>
+                <option value="google/gemini-pro">Gemini Pro</option>
+            </select>
+        </div>
+        <div class="messages" id="messagesArea">
+            <div class="welcome" id="welcomeScreen">
+                <div class="welcome-icon">🤖</div>
+                <h1>NEXUS AI</h1>
+                <p>Powered by Claude AI. Ask me anything!</p>
+                <div class="suggestions">
+                    <div class="suggestion" onclick="ask('Explain quantum computing simply')">
+                        <i class="fas fa-atom"></i>
+                        <h4>Quantum Computing</h4>
+                        <p>Explain it simply</p>
+                    </div>
+                    <div class="suggestion" onclick="ask('Write a Python function')">
+                        <i class="fas fa-code"></i>
+                        <h4>Write Code</h4>
+                        <p>Python, JS, etc</p>
+                    </div>
+                    <div class="suggestion" onclick="ask('Plan a 7-day Japan trip')">
+                        <i class="fas fa-plane"></i>
+                        <h4>Trip Planning</h4>
+                        <p>Japan itinerary</p>
+                    </div>
+                    <div class="suggestion" onclick="ask('Best web security practices')">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Web Security</h4>
+                        <p>Best practices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="credit-info">Powered by OpenRouter | Model: <span id="currentModel">Claude 3.5 Sonnet</span></div>
+        <div class="input-area">
+            <div class="input-box">
+                <textarea id="userInput" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+        let messages = [];
+        let isTyping = false;
+        const API_KEY = localStorage.getItem('nexusAI_key');
+        if (!API_KEY) window.location.href = 'ai-setup.html';
+        document.getElementById('userInput').focus();
+        document.getElementById('modelSelect').addEventListener('change', function() {
+            document.getElementById('currentModel').textContent = this.options[this.selectedIndex].text;
+        });
+        function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+        function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 150) + 'px'; }
+        function ask(text) { document.getElementById('userInput').value = text; sendMsg(); }
+        async function sendMsg() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text || isTyping) return;
+            document.getElementById('welcomeScreen').style.display = 'none';
+            messages.push({ role: 'user', content: text });
+            renderMsg('user', text);
+            input.value = '';
+            input.style.height = 'auto';
+            isTyping = true;
+            renderTyping();
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+                    body: JSON.stringify({ model: document.getElementById('modelSelect').value, messages: messages.map(m => ({ role: m.role, content: m.content })) })
+                });
+                const data = await response.json();
+                document.getElementById('typingEl')?.remove();
+                if (data.choices && data.choices[0]) { const reply = data.choices[0].message.content; messages.push({ role: 'assistant', content: reply }); renderMsg('ai', reply); }
+                else if (data.error) renderMsg('ai', 'Error: ' + (data.error.message || 'Failed'));
+            } catch (err) { document.getElementById('typingEl')?.remove(); renderMsg('ai', 'Error: ' + err.message); }
+            isTyping = false;
+        }
+        function renderMsg(role, content) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const area = document.getElementById('messagesArea');
+            area.insertAdjacentHTML('beforeend', `<div class="message ${role}"><div class="avatar"><i class="fas fa-${role === 'user' ? 'user' : 'robot'}"></i></div><div class="msg-content"><div class="msg-header"><span class="msg-name">${role === 'user' ? 'You' : 'NEXUS AI'}</span><span class="msg-time">${time}</span></div><div class="msg-text">${formatContent(content)}</div></div></div>`);
+            area.scrollTop = area.scrollHeight;
+        }
+        function renderTyping() {
+            const area = document.getElementById('messagesArea');
+            area.insertAdjacentHTML('beforeend', `<div class="message ai" id="typingEl"><div class="avatar"><i class="fas fa-robot"></i></div><div class="msg-content"><div class="msg-header"><span class="msg-name">NEXUS AI</span><span class="msg-time">typing...</span></div><div class="typing"><span></span><span></span><span></span></div></div></div>`);
+            area.scrollTop = area.scrollHeight;
+        }
+        function formatContent(content) {
+            let f = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            f = f.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+            f = f.replace(/`([^`]+)`/g, '<code>$1</code>');
+            f = f.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            f = f.replace(/\n/g, '<br>');
+            return f;
+        }
+        function clearChat() {
+            if (confirm('Clear chat?')) { messages = []; document.getElementById('messagesArea').innerHTML = '<div class="welcome" id="welcomeScreen"><div class="welcome-icon">🤖</div><h1>NEXUS AI</h1><p>Powered by Claude AI. Ask me anything!</p></div>'; }
+        }
+        function exportChat() {
+            if (messages.length === 0) { alert('No messages'); return; }
+            let text = 'NEXUS AI Chat\n' + '='.repeat(50) + '\n\n';
+            messages.forEach(m => { text += `${m.role === 'user' ? 'You' : 'NEXUS AI'}:\n${m.content}\n\n`; });
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `nexus-chat-${Date.now()}.txt`; a.click();
+        }
+        function changeKey() { localStorage.removeItem('nexusAI_key'); window.location.href = 'ai-setup.html'; }
+    </script>
+</body>
+</html>
