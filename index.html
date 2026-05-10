@@ -389,6 +389,14 @@
                 sessionStorage.setItem('nexusUser', username);
                 sessionStorage.setItem('nexusFullname', user.fullname || username);
                 sessionStorage.setItem('nexusIsAdmin', 'false');
+
+                // Ensure user is in allUsers list
+                const allUsers = JSON.parse(localStorage.getItem('nexusAllUsers') || '[]');
+                if (!allUsers.find(u => u.username === username)) {
+                    allUsers.push({ fullname: user.fullname, username, password, isAdmin: false });
+                    localStorage.setItem('nexusAllUsers', JSON.stringify(allUsers));
+                }
+
                 window.location.href = 'dashboard.html';
             } else {
                 alert('Invalid credentials! Use admin (satyajeet18 / 4918) or register a new account.');

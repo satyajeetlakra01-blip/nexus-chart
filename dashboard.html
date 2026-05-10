@@ -427,6 +427,35 @@
             gap: 10px;
         }
 
+        .file-upload-area {
+            border: 2px dashed rgba(0, 240, 255, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-area:hover, .file-upload-area.dragover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .file-upload-area i {
+            font-size: 40px;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+        }
+
+        .file-upload-area p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .file-upload-area input {
+            display: none;
+        }
+
         .upload-form {
             display: flex;
             flex-direction: column;
@@ -1481,7 +1510,7 @@
                     <h3><i class="fas fa-cloud-upload-alt"></i> Post to Nexus</h3>
                     <form class="upload-form" id="uploadForm">
                         <input type="text" id="postTitle" placeholder="Title for your post..." required>
-                        <textarea id="postDescription" placeholder="Describe this resource..." required></textarea>
+                        <textarea id="postDescription" placeholder="Describe this resource..." style="resize: none;" required></textarea>
                         <div class="privacy-options" style="display: flex; gap: 15px; margin-bottom: 15px;">
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                 <input type="radio" name="postPrivacy" value="public" checked onchange="toggleRecipientSelect()">
@@ -1744,7 +1773,7 @@
         // User data - Admin: satyajeet18
         let username = localStorage.getItem('nexusUser') || sessionStorage.getItem('nexusUser') || 'Guest';
         let fullname = localStorage.getItem('nexusFullname') || username;
-        let isAdmin = username.toLowerCase() === 'satyajeet18';
+        let isAdmin = (username.toLowerCase() === 'satyajeet18');
 
         // Initialize user info on load
         document.getElementById('userName').textContent = fullname || username;
@@ -1784,7 +1813,7 @@
             document.getElementById('chatRecipientDiv').style.display = privacy === 'private' ? 'block' : 'none';
         }
 
-        // Populate recipient dropdowns
+        // Populate recipient dropdowns with all registered users
         function populateRecipientDropdowns() {
             const postRecipient = document.getElementById('postRecipient');
             const chatRecipient = document.getElementById('chatRecipient');
@@ -1795,11 +1824,17 @@
             chatRecipient.innerHTML = '<option value="">To:</option>';
             chatPartnerSelect.innerHTML = '<option value="">Everyone</option>';
 
-            // Add team members
-            teamMembers.forEach(member => {
-                postRecipient.innerHTML += `<option value="${member.username}">${member.name}</option>`;
-                chatRecipient.innerHTML += `<option value="${member.username}">${member.name}</option>`;
-                chatPartnerSelect.innerHTML += `<option value="${member.username}">${member.name}</option>`;
+            // Get all registered users
+            const allUsers = JSON.parse(localStorage.getItem('nexusAllUsers') || '[]');
+
+            // Add all users except current user
+            allUsers.forEach(user => {
+                if (user.username !== username) {
+                    const displayName = user.fullname || user.username;
+                    postRecipient.innerHTML += `<option value="${user.username}">${displayName}</option>`;
+                    chatRecipient.innerHTML += `<option value="${user.username}">${displayName}</option>`;
+                    chatPartnerSelect.innerHTML += `<option value="${user.username}">${displayName}</option>`;
+                }
             });
         }
 
@@ -1860,7 +1895,47 @@
             }
         }
 
-        // File selection
+        // File selection with drag and drop
+        const fileUploadArea = document.querySelector('.file-upload-row');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight on drag
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, () => {
+                fileUploadArea.style.borderColor = 'var(--neon-cyan)';
+                fileUploadArea.style.background = 'rgba(0, 240, 255, 0.1)';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, () => {
+                fileUploadArea.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+                fileUploadArea.style.background = 'transparent';
+            });
+        });
+
+        // Handle dropped files
+        fileUploadArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                document.getElementById('fileInput').files = files;
+                const fileName = files[0].name;
+                const display = document.getElementById('selectedFileName');
+                display.style.display = 'inline';
+                display.textContent = fileName;
+            }
+        });
+
         document.getElementById('fileInput').addEventListener('change', function() {
             const fileName = this.files[0]?.name;
             const display = document.getElementById('selectedFileName');
@@ -2042,20 +2117,24 @@
         function createGroupChat() {
             const groupName = prompt('Enter group name:');
             if (!groupName) return;
+            const allUsers = JSON.parse(localStorage.getItem('nexusAllUsers') || '[]');
             const selectedMembers = [];
-            teamMembers.forEach(m => {
-                if (confirm(`Add ${m.name} to group?`)) selectedMembers.push(m.username);
+            allUsers.forEach(user => {
+                if (user.username !== username && confirm(`Add ${user.fullname || user.username} to group "${groupName}"?`)) {
+                    selectedMembers.push(user.username);
+                }
             });
             const group = {
                 id: Date.now(),
                 name: groupName,
+                creator: username,
                 members: [username, ...selectedMembers],
                 messages: []
             };
             const groups = JSON.parse(localStorage.getItem('nexusGroups') || '[]');
             groups.push(group);
             localStorage.setItem('nexusGroups', JSON.stringify(groups));
-            alert(`Group "${groupName}" created!`);
+            alert(`Group "${groupName}" created with ${selectedMembers.length + 1} members!`);
         }
 
         document.getElementById('chatFile').addEventListener('change', function() {

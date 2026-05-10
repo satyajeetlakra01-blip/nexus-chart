@@ -321,6 +321,11 @@
             alert('Account created! Please login.');
             window.location.href = 'index.html';
         });
+
+        // Save new user to allUsers list for recipient dropdowns
+        const allUsers = JSON.parse(localStorage.getItem('nexusAllUsers') || '[]');
+        allUsers.push({ fullname, username, password, isAdmin: false });
+        localStorage.setItem('nexusAllUsers', JSON.stringify(allUsers));
     </script>
 </body>
 </html>
