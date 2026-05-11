@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS AI - Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --neon-cyan: #00f0ff; --neon-pink: #ff006e; --neon-purple: #8b5cf6; --dark-bg: #0a0a0f; }
+        body { font-family: 'Rajdhani', sans-serif; min-height: 100vh; background: var(--dark-bg); color: #fff; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 36px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; margin-bottom: 30px; }
+        .card { background: rgba(15,15,25,0.95); border: 1px solid rgba(0,240,255,0.2); border-radius: 20px; padding: 40px; }
+        .card h2 { color: var(--neon-cyan); margin-bottom: 15px; font-family: 'Orbitron', sans-serif; text-align: center; }
+        .card p { color: rgba(255,255,255,0.7); margin-bottom: 20px; text-align: center; font-size: 14px; }
+        .steps { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px; text-align: left; }
+        .steps h3 { color: var(--neon-cyan); margin-bottom: 12px; font-size: 14px; }
+        .steps ol { color: rgba(255,255,255,0.7); font-size: 13px; padding-left: 20px; }
+        .steps li { margin-bottom: 8px; }
+        .steps a { color: var(--neon-cyan); text-decoration: none; }
+        .steps a:hover { text-decoration: underline; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 10px; color: #fff; font-size: 14px; font-family: 'Rajdhani', sans-serif; }
+        .input-group input:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+        .btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border: none; border-radius: 10px; color: #000; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,240,255,0.3); }
+        .error { background: rgba(255,0,110,0.2); border: 1px solid var(--neon-pink); border-radius: 10px; padding: 12px; color: var(--neon-pink); margin-bottom: 15px; font-size: 13px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"><i class="fas fa-robot"></i> NEXUS AI</div>
+        <div class="card">
+            <h2>Connect Your API Key</h2>
+            <p>Get your free OpenRouter API key to power NEXUS AI</p>
+            <div class="steps">
+                <h3><i class="fas fa-key"></i> How to get API Key:</h3>
+                <ol>
+                    <li>Visit <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a></li>
+                    <li>Sign up with Google or GitHub</li>
+                    <li>Click "Create Key" and copy it</li>
+                    <li>Paste below</li>
+                </ol>
+            </div>
+            <div class="error" id="errorMsg"></div>
+            <div class="input-group">
+                <label>Your OpenRouter API Key</label>
+                <input type="password" id="apiKey" placeholder="sk-or-v1-xxxxxxxxxxxx">
+            </div>
+            <button class="btn" onclick="startAI()"><i class="fas fa-rocket"></i> Launch NEXUS AI</button>
+        </div>
+    </div>
+    <script>
+        function startAI() {
+            const key = document.getElementById('apiKey').value.trim();
+            if (!key) { showError('Please enter your API key'); return; }
+            if (!key.startsWith('sk-or-v1-')) { showError('Invalid key format. Must start with sk-or-v1-'); return; }
+            localStorage.setItem('nexusAI_key', key);
+            window.location.href = 'nexus-chat.html';
+        }
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

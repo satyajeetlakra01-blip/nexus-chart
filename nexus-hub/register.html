@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS HUB - Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff006e;
+            --neon-purple: #8b5cf6;
+            --dark-bg: #0a0a0f;
+            --card-bg: rgba(15, 15, 25, 0.8);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            background: var(--dark-bg);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(139, 92, 246, 0.3), transparent 70%); top: -100px; right: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(0, 240, 255, 0.3), transparent 70%); bottom: -50px; left: -50px; animation-delay: -4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(30px, -30px); }
+            50% { transform: translate(-20px, 20px); }
+            75% { transform: translate(-30px, -20px); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-pink);
+            border-radius: 50%;
+            animation: particleFloat 10s linear infinite;
+            box-shadow: 0 0 6px var(--neon-pink);
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        .register-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 0, 110, 0.2);
+            border-radius: 20px;
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: boxSlideUp 1s ease-out;
+        }
+
+        @keyframes boxSlideUp {
+            0% { opacity: 0; transform: translateY(50px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo { text-align: center; margin-bottom: 40px; }
+
+        .logo-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: var(--neon-pink);
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+        }
+
+        .form-group { margin-bottom: 25px; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .input-wrapper { position: relative; }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 0, 110, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 0, 110, 0.5);
+            font-size: 16px;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-register:hover::before { left: 100%; }
+        .btn-register:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(255, 0, 110, 0.4); }
+
+        .login-link { text-align: center; margin-top: 30px; }
+
+        .login-link a {
+            color: var(--neon-pink);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .login-link a:hover { text-shadow: 0 0 20px var(--neon-pink); }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 2px);
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="grid-overlay"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="register-container">
+        <div class="register-box">
+            <div class="logo">
+                <div class="logo-icon">&#9670;</div>
+                <h1>NEXUS HUB</h1>
+            </div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">&#9786;</span>
+                        <input type="text" id="fullname" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">&#9679;</span>
+                        <input type="text" id="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">&#9679;</span>
+                        <input type="password" id="password" placeholder="Create a password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register">
+                    <span>CREATE ACCOUNT</span>
+                </button>
+            </form>
+
+            <div class="login-link">
+                <a href="index.html">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="scanlines"></div>
+
+    <script>
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 25; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fullname = document.getElementById('fullname').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Save user
+            const savedUsers = JSON.parse(localStorage.getItem('nexusUsers') || '[]');
+
+            // Check if username exists
+            if (savedUsers.find(u => u.username === username)) {
+                alert('Username already exists!');
+                return;
+            }
+
+            savedUsers.push({ fullname, username, password });
+            localStorage.setItem('nexusUsers', JSON.stringify(savedUsers));
+
+            alert('Account created! Please login.');
+            window.location.href = 'index.html';
+        });
+
+        // Save new user to allUsers list for recipient dropdowns
+        const allUsers = JSON.parse(localStorage.getItem('nexusAllUsers') || '[]');
+        allUsers.push({ fullname, username, password, isAdmin: false });
+        localStorage.setItem('nexusAllUsers', JSON.stringify(allUsers));
+    </script>
+</body>
+</html>
