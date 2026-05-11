@@ -249,6 +249,16 @@
                                         <option value="25">25 Questions</option>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label>Pages</label>
+                                    <select id="pageCount">
+                                        <option value="1" selected>1 Page</option>
+                                        <option value="2">2 Pages</option>
+                                        <option value="3">3 Pages</option>
+                                        <option value="5">5 Pages</option>
+                                        <option value="10">10 Pages</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="form-row">
@@ -438,6 +448,7 @@
             const subject = document.getElementById('subjectSelect').value;
             const chapter = document.getElementById('chapterInput').value;
             const count = document.getElementById('questionCount').value;
+            const pages = document.getElementById('pageCount').value;
             const type = document.getElementById('questionType').value;
 
             if (!board || !classNum || !subject || !chapter) {
@@ -449,6 +460,7 @@
 
 Chapter/Topic: ${chapter}
 Number of Questions: ${count}
+Number of Pages: ${pages}
 Question Type: ${type}
 
 Format the output as follows:
@@ -456,12 +468,25 @@ Format the output as follows:
 - Class: [Class]
 - Chapter: [Chapter Name]
 - Total Marks: [marks]
+- Pages: ${pages}
 
-For EACH question, present it with its answer right after:
-"Question [number]: [question text] ([marks] marks)
-Answer: [full solution with steps, formulas, and explanations]"
+IMPORTANT: Each main topic/topic starts on a NEW PAGE. Format as:
 
-Then leave blank lines between each Question-Answer pair for students to write.
+══════════ PAGE 1 ══════════
+[Topic/Subtopic Name]
+
+Question [number]: [question text] ([marks] marks)
+Answer: [full solution with steps, formulas, and explanations]
+
+Question [number+1]: [question text] ([marks] marks)
+Answer: [full solution]
+
+══════════ PAGE 2 ══════════
+[Next Topic/Subtopic Name]
+
+... and so on until all ${pages} pages are complete.
+
+Each page should have ${Math.ceil(count/pages)} questions with their answers. Make each topic/page complete on its own.`;
 
 Include: Question variety, age-appropriate difficulty, and clear instructions.`;
 
