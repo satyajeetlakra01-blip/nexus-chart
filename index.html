@@ -402,24 +402,26 @@
                 });
 
                 const data = await response.json();
-                const indicator = document.getElementById('typingIndicator');
-                if (indicator) indicator.closest('.msg-text')?.remove();
 
-                if (data.choices && data.choices[0]) {
+                if (data.error) {
+                    const lastDiv = area.lastElementChild;
+                    if (lastDiv && lastDiv.querySelector('.msg-text')) {
+                        lastDiv.querySelector('.msg-text').innerHTML = '<span style="color:var(--neon-pink)">Error: ' + (data.error.message || 'Invalid API Key. Please check your key.') + '</span>';
+                    }
+                } else if (data.choices && data.choices[0]) {
                     const content = data.choices[0].message.content;
                     messages.push({ role: 'assistant', content });
                     const lastDiv = area.lastElementChild;
-                    if (lastDiv) {
+                    if (lastDiv && lastDiv.querySelector('.msg-text')) {
                         lastDiv.querySelector('.msg-text').innerHTML = formatContent(content);
                         area.scrollTop = area.scrollHeight;
                     }
-                } else {
-                    const lastDiv = area.lastElementChild;
-                    if (lastDiv) lastDiv.querySelector('.msg-text').innerHTML = '<span style="color:var(--neon-pink)">Error: ' + (data.error?.message || 'Unknown error') + '</span>';
                 }
             } catch (err) {
                 const lastDiv = area.lastElementChild;
-                if (lastDiv) lastDiv.querySelector('.msg-text').innerHTML = '<span style="color:var(--neon-pink)">Error: ' + err.message + '</span>';
+                if (lastDiv && lastDiv.querySelector('.msg-text')) {
+                    lastDiv.querySelector('.msg-text').innerHTML = '<span style="color:var(--neon-pink)">Error: ' + err.message + '</span>';
+                }
             }
 
             isTyping = false;
