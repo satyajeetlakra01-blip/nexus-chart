@@ -28,6 +28,7 @@
         .model-bar { padding: 10px 30px; background: rgba(0,0,0,0.3); display: flex; align-items: center; gap: 15px; }
         .model-bar label { font-size: 12px; color: rgba(255,255,255,0.5); }
         .model-select { padding: 6px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; color: #fff; font-family: 'Rajdhani', sans-serif; cursor: pointer; }
+        .model-select option { background: var(--dark-bg); }
 
         /* Main Content Area */
         .main-content { flex: 1; display: flex; overflow: hidden; }
@@ -97,174 +98,153 @@
         .generate-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border: none; border-radius: 12px; color: #000; font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,240,255,0.3); }
         .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .project-output { margin-top: 30px; display: none; }
+        .project-output { display: none; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; padding: 25px; margin-top: 20px; }
         .project-output.show { display: block; }
-        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .output-header h3 { color: var(--neon-cyan); }
+        .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .output-header h3 { font-size: 18px; color: var(--neon-cyan); }
         .output-actions { display: flex; gap: 10px; }
-        .output-action { padding: 8px 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 8px; color: var(--neon-cyan); cursor: pointer; font-size: 13px; transition: all 0.3s; }
-        .output-action:hover { background: rgba(0,240,255,0.1); }
-        .project-result { background: rgba(0,0,0,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 15px; padding: 25px; white-space: pre-wrap; line-height: 1.8; font-size: 14px; }
-
-        /* Subject Icons */
-        .subject-icon { display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border-radius: 8px; text-align: center; line-height: 30px; margin-right: 10px; }
-
-        /* Loading */
-        .loading { text-align: center; padding: 40px; color: var(--neon-cyan); }
-        .loading i { font-size: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 3px; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .suggestions { grid-template-columns: 1fr; } .header, .messages, .input-area, .model-bar, .project-container { padding-left: 15px; padding-right: 15px; } }
+        .output-action { padding: 8px 15px; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); border-radius: 8px; color: var(--neon-cyan); cursor: pointer; font-family: 'Rajdhani', sans-serif; font-size: 12px; transition: all 0.3s; display: flex; align-items: center; gap: 5px; }
+        .output-action:hover { background: rgba(0,240,255,0.2); }
+        .project-result { font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
+        .project-result h2, .project-result h3 { color: var(--neon-purple); margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Tab Navigation -->
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('chat')">
-                <i class="fas fa-comments"></i> AI Chat
-            </button>
-            <button class="tab-btn" onclick="switchTab('project')">
-                <i class="fas fa-graduation-cap"></i> Project Generator
-            </button>
+            <button class="tab-btn active" onclick="switchTab('chat')"><i class="fas fa-comments"></i> AI Chat</button>
+            <button class="tab-btn" onclick="switchTab('project')"><i class="fas fa-file-alt"></i> Project Generator</button>
         </div>
 
-        <header class="header">
+        <div class="header">
             <h1><i class="fas fa-robot"></i> NEXUS AI</h1>
             <div class="header-actions">
-                <button class="header-btn" onclick="exportChat()"><i class="fas fa-download"></i> Export</button>
                 <button class="header-btn" onclick="clearChat()"><i class="fas fa-trash"></i> Clear</button>
-                <button class="header-btn" onclick="changeKey()"><i class="fas fa-key"></i> Key</button>
             </div>
-        </header>
+        </div>
 
         <div class="model-bar">
-            <label>Model:</label>
+            <label><i class="fas fa-cog"></i> Model:</label>
             <select class="model-select" id="modelSelect">
-                <option value="anthropic/claude-3-haiku" selected>Claude 3 Haiku (Fast)</option>
+                <option value="anthropic/claude-haiku-4-7-20251107">Claude 3 Haiku (Free)</option>
+                <option value="anthropic/claude-sonnet-4-6-20251120">Claude Sonnet 4.6</option>
+                <option value="anthropic/claude-haiku-4-5-20250612">Claude Haiku 4.5</option>
+                <option value="google/gemini-pro-1.5-flash">Gemini Pro 1.5</option>
+                <option value="anthropic/claude-opus-4-7-20250124">Claude Opus 4.7</option>
             </select>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <!-- Chat View -->
+            <!-- AI Chat Tab -->
             <div class="chat-view" id="chatView">
-                <div class="messages" id="messagesArea">
-                    <div class="welcome" id="welcomeScreen">
-                        <div class="welcome-icon">🤖</div>
-                        <h1>NEXUS AI</h1>
-                        <p>Powered by Claude AI. Ask me anything!</p>
-                        <div class="suggestions">
-                            <div class="suggestion" onclick="ask('Explain quantum computing simply')">
-                                <i class="fas fa-atom"></i>
-                                <h4>Quantum Computing</h4>
-                                <p>Explain it simply</p>
-                            </div>
-                            <div class="suggestion" onclick="ask('Write a Python function')">
-                                <i class="fas fa-code"></i>
-                                <h4>Write Code</h4>
-                                <p>Python, JS, etc</p>
-                            </div>
-                            <div class="suggestion" onclick="ask('Plan a 7-day Japan trip')">
-                                <i class="fas fa-plane"></i>
-                                <h4>Trip Planning</h4>
-                                <p>Japan itinerary</p>
-                            </div>
-                            <div class="suggestion" onclick="ask('Best web security practices')">
-                                <i class="fas fa-shield-alt"></i>
-                                <h4>Web Security</h4>
-                                <p>Best practices</p>
-                            </div>
+                <div class="welcome" id="welcomeScreen">
+                    <div class="welcome-icon">&#9881;</div>
+                    <h1>NEXUS AI</h1>
+                    <p>Your AI study companion. Generate school projects, assignments, and get help with any subject.</p>
+                    <div class="suggestions">
+                        <div class="suggestion" onclick="askSuggestion('CBSE Class 10 Physics Chapter Light')">
+                            <i class="fas fa-lightbulb"></i>
+                            <h4>CBSE Physics</h4>
+                            <p>Light - Class 10</p>
+                        </div>
+                        <div class="suggestion" onclick="askSuggestion('ICSE Class 8 Chemistry Solutions')">
+                            <i class="fas fa-flask"></i>
+                            <h4>ICSE Chemistry</h4>
+                            <p>Solutions - Class 8</p>
+                        </div>
+                        <div class="suggestion" onclick="askSuggestion('IB History World War')')">
+                            <i class="fas fa-globe"></i>
+                            <h4>IB History</h4>
+                            <p>World War</p>
+                        </div>
+                        <div class="suggestion" onclick="askSuggestion('American Government Constitution')">
+                            <i class="fas fa-landmark"></i>
+                            <h4>US Government</h4>
+                            <p>Constitution</p>
                         </div>
                     </div>
                 </div>
+
+                <div class="messages" id="messagesArea" style="display: none;">
+                    <div class="welcome" id="emptyChat" style="display: none;">
+                        <h1>How can I help?</h1>
+                        <p>Type your question or select a suggestion above.</p>
+                    </div>
+                </div>
+
                 <div class="input-area">
                     <div class="input-box">
-                        <textarea id="userInput" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-                        <button class="send-btn" id="sendBtn" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+                        <textarea id="userInput" placeholder="Ask anything... Type / for commands"></textarea>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Project View -->
+            <!-- Project Generator Tab -->
             <div class="project-view hidden" id="projectView">
                 <div class="project-container">
-                    <div class="project-form">
-                        <h1 class="project-title">🎓 Project Generator</h1>
-                        <p class="project-subtitle">Generate school assignments & projects instantly</p>
+                    <div class="project-title"><i class="fas fa-file-alt"></i> Project Generator</div>
+                    <div class="project-subtitle">Generate school assignments with Q&A</div>
 
+                    <div class="project-form">
                         <div class="form-section">
-                            <h3><i class="fas fa-school"></i> Board & Class</h3>
+                            <h3><i class="fas fa-graduation-cap"></i> Select Board & Class</h3>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Board</label>
                                     <select id="boardSelect">
                                         <option value="">Select Board</option>
                                         <option value="CBSE">CBSE</option>
-                                        <option value="ICSE">ICSE / CISCE</option>
+                                        <option value="ICSE">ICSE</option>
                                         <option value="State Board">State Board</option>
-                                        <option value="Cambridge">Cambridge (IGCSE)</option>
-                                        <option value="IB">International Baccalaureate (IB)</option>
-                                        <option value="American">American Curriculum</option>
+                                        <option value="Cambridge">Cambridge</option>
+                                        <option value="IB">IB</option>
+                                        <option value="American">American</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Class</label>
                                     <select id="classSelect">
                                         <option value="">Select Class</option>
-                                        <option value="Class 1">Class 1</option>
-                                        <option value="Class 2">Class 2</option>
-                                        <option value="Class 3">Class 3</option>
-                                        <option value="Class 4">Class 4</option>
-                                        <option value="Class 5">Class 5</option>
-                                        <option value="Class 6">Class 6</option>
-                                        <option value="Class 7">Class 7</option>
-                                        <option value="Class 8">Class 8</option>
-                                        <option value="Class 9">Class 9</option>
-                                        <option value="Class 10">Class 10</option>
-                                        <option value="Class 11">Class 11</option>
-                                        <option value="Class 12">Class 12</option>
+                                        <option value="1">Class 1</option>
+                                        <option value="2">Class 2</option>
+                                        <option value="3">Class 3</option>
+                                        <option value="4">Class 4</option>
+                                        <option value="5">Class 5</option>
+                                        <option value="6">Class 6</option>
+                                        <option value="7">Class 7</option>
+                                        <option value="8">Class 8</option>
+                                        <option value="9">Class 9</option>
+                                        <option value="10">Class 10</option>
+                                        <option value="11">Class 11</option>
+                                        <option value="12">Class 12</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-section">
-                            <h3><i class="fas fa-book"></i> Subject & Chapter</h3>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Subject</label>
                                     <select id="subjectSelect">
                                         <option value="">Select Subject</option>
-                                        <option value="Mathematics">📐 Mathematics</option>
-                                        <option value="Science">🔬 Science</option>
-                                        <option value="Physics">⚛️ Physics</option>
-                                        <option value="Chemistry">🧪 Chemistry</option>
-                                        <option value="Biology">🧬 Biology</option>
-                                        <option value="English">📚 English</option>
-                                        <option value="Hindi">🇮🇳 Hindi</option>
-                                        <option value="History">🏛️ History</option>
-                                        <option value="Geography">🌍 Geography</option>
-                                        <option value="Civics">🏛️ Civics</option>
-                                        <option value="Economics">💰 Economics</option>
-                                        <option value="Computer Science">💻 Computer Science</option>
+                                        <option value="Math">Math</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Physics">Physics</option>
+                                        <option value="Chemistry">Chemistry</option>
+                                        <option value="Biology">Biology</option>
+                                        <option value="English">English</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="History">History</option>
+                                        <option value="Geography">Geography</option>
+                                        <option value="Civics">Civics</option>
+                                        <option value="Economics">Economics</option>
+                                        <option value="Computer">Computer</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Chapter/Topic</label>
-                                    <input type="text" id="chapterInput" placeholder="e.g., Linear Equations, Force & Motion">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3><i class="fas fa-list-ol"></i> Assignment Details</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Number of Questions</label>
+                                    <label>Questions</label>
                                     <select id="questionCount">
                                         <option value="5">5 Questions</option>
                                         <option value="10" selected>10 Questions</option>
@@ -273,14 +253,21 @@
                                         <option value="25">25 Questions</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Chapter/Topic</label>
+                                    <input type="text" id="chapterInput" placeholder="e.g., Light - Reflection">
+                                </div>
                                 <div class="form-group">
                                     <label>Question Type</label>
                                     <select id="questionType">
-                                        <option value="all">Mix of All Types</option>
-                                        <option value="short">Short Answer</option>
-                                        <option value="long">Long Answer</option>
-                                        <option value="mcq">MCQ (Multiple Choice)</option>
-                                        <option value="numerical">Numerical/Problem Solving</option>
+                                        <option value="Short">Short (2 marks)</option>
+                                        <option value="Long">Long (5 marks)</option>
+                                        <option value="MCQ">MCQ (1 mark)</option>
+                                        <option value="Numerical">Numerical</option>
+                                        <option value="Mix">Mix (All types)</option>
                                     </select>
                                 </div>
                             </div>
@@ -318,69 +305,136 @@
         document.getElementById('userInput').focus();
 
         function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
             document.getElementById('chatView').classList.toggle('hidden', tab !== 'chat');
             document.getElementById('projectView').classList.toggle('hidden', tab !== 'project');
+            if (tab === 'chat') {
+                setTimeout(() => document.getElementById('userInput').focus(), 100);
+            }
         }
 
-        // Chat functions
-        function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
-        function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 150) + 'px'; }
-        function ask(text) { document.getElementById('userInput').value = text; sendMsg(); }
+        
+        function clearChat() {
+            messages = [];
+            document.getElementById('messagesArea').innerHTML = '';
+            document.getElementById('emptyChat').style.display = 'flex';
+            document.getElementById('welcomeScreen').style.display = 'flex';
+        }
 
-        async function sendMsg() {
+        function askSuggestion(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        function formatContent(text) {
+            return text.replace(/\n/g, '<br>')
+                       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                       .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                       .replace(/`(.+?)`/gs, '<code>$1</code>')
+                       .replace(/```(.+?)```/gs, '<pre>$1</pre>');
+        }
+
+        async function sendMessage() {
             const input = document.getElementById('userInput');
             const text = input.value.trim();
             if (!text || isTyping) return;
+
             document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('emptyChat').style.display = 'none';
+            document.getElementById('messagesArea').style.display = 'flex';
+
             messages.push({ role: 'user', content: text });
-            renderMsg('user', text);
+            addMessage('user', text);
             input.value = '';
-            input.style.height = 'auto';
+            await getAIResponse();
+        }
+
+        function addMessage(role, content) {
+            const area = document.getElementById('messagesArea');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.innerHTML = `
+                <div class="avatar"><i class="fas ${role === 'user' ? 'fa-user' : 'fa-robot'}"></i></div>
+                <div class="msg-content">
+                    <div class="msg-header">
+                        <span class="msg-name">${role === 'user' ? 'You' : 'Claude Haiku'}</span>
+                        <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="msg-text">${formatContent(content)}</div>
+                </div>
+            `;
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        async function getAIResponse() {
             isTyping = true;
-            renderTyping();
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            const area = document.getElementById('messagesArea');
+            const div = document.createElement('div');
+            div.className = 'message ai';
+            div.innerHTML = `
+                <div class="avatar"><i class="fas fa-robot"></i></div>
+                <div class="msg-content">
+                    <div class="msg-header">
+                        <span class="msg-name">Claude Haiku</span>
+                        <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="msg-text typing" id="typingIndicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            area.appendChild(div);
+            area.scrollTop = area.scrollHeight;
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
-                    body: JSON.stringify({ model: document.getElementById('modelSelect').value, messages: messages.map(m => ({ role: m.role, content: m.content })) })
+                    body: JSON.stringify({
+                        model: document.getElementById('modelSelect').value,
+                        messages: messages
+                    })
                 });
+
                 const data = await response.json();
-                document.getElementById('typingEl')?.remove();
-                if (data.choices && data.choices[0]) { const reply = data.choices[0].message.content; messages.push({ role: 'assistant', content: reply }); renderMsg('ai', reply); }
-                else if (data.error) renderMsg('ai', 'Error: ' + (data.error.message || 'Failed'));
-            } catch (err) { document.getElementById('typingEl')?.remove(); renderMsg('ai', 'Error: ' + err.message); }
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) indicator.closest('.msg-text')?.remove();
+
+                if (data.choices && data.choices[0]) {
+                    const content = data.choices[0].message.content;
+                    messages.push({ role: 'assistant', content });
+                    const lastDiv = area.lastElementChild;
+                    if (lastDiv) {
+                        lastDiv.querySelector('.msg-text').innerHTML = formatContent(content);
+                        area.scrollTop = area.scrollHeight;
+                    }
+                } else {
+                    const lastDiv = area.lastElementChild;
+                    if (lastDiv) lastDiv.querySelector('.msg-text').innerHTML = '<span style="color:var(--neon-pink)">Error: ' + (data.error?.message || 'Unknown error') + '</span>';
+                }
+            } catch (err) {
+                const lastDiv = area.lastElementChild;
+                if (lastDiv) lastDiv.querySelector('.msg-text').innerHTML = '<span style="color:var(--neon-pink)">Error: ' + err.message + '</span>';
+            }
+
             isTyping = false;
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
         }
 
-        function renderMsg(role, content) {
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const area = document.getElementById('messagesArea');
-            area.insertAdjacentHTML('beforeend', `<div class="message ${role}"><div class="avatar"><i class="fas fa-${role === 'user' ? 'user' : 'robot'}"></i></div><div class="msg-content"><div class="msg-header"><span class="msg-name">${role === 'user' ? 'You' : 'NEXUS AI'}</span><span class="msg-time">${time}</span></div><div class="msg-text">${formatContent(content)}</div></div></div>`);
-            area.scrollTop = area.scrollHeight;
-        }
+        document.getElementById('userInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
 
-        function renderTyping() {
-            const area = document.getElementById('messagesArea');
-            area.insertAdjacentHTML('beforeend', `<div class="message ai" id="typingEl"><div class="avatar"><i class="fas fa-robot"></i></div><div class="msg-content"><div class="msg-header"><span class="msg-name">NEXUS AI</span><span class="msg-time">typing...</span></div><div class="typing"><span></span><span></span><span></span></div></div></div>`);
-            area.scrollTop = area.scrollHeight;
-        }
-
-        function formatContent(content) {
-            let f = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            f = f.replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-            f = f.replace(/`([^`]+)`/g, '<code>$1</code>');
-            f = f.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-            f = f.replace(/\n/g, '<br>');
-            return f;
-        }
-
-        function clearChat() { if (confirm('Clear chat?')) { messages = []; document.getElementById('messagesArea').innerHTML = '<div class="welcome" id="welcomeScreen"><div class="welcome-icon">🤖</div><h1>NEXUS AI</h1><p>Powered by Claude AI. Ask me anything!</p></div>'; } }
-        function exportChat() { if (messages.length === 0) { alert('No messages'); return; } let text = 'NEXUS AI Chat\n' + '='.repeat(50) + '\n\n'; messages.forEach(m => { text += `${m.role === 'user' ? 'You' : 'NEXUS AI'}:\n${m.content}\n\n`; }); const blob = new Blob([text], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `nexus-chat-${Date.now()}.txt`; a.click(); }
-        function changeKey() { localStorage.removeItem('nexusAI_key'); window.location.href = 'ai-setup.html'; }
-
-        // Project Generator
         async function generateProject() {
             const board = document.getElementById('boardSelect').value;
             const classNum = document.getElementById('classSelect').value;
